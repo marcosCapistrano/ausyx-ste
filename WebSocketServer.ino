@@ -1,5 +1,5 @@
-const char *ssid = "myssid";
-const char *password = "mypassword";
+const char *ssid = "AusyxSTE_01";
+const char *password = "ausyx_ste";
 WebSocketsServer webSocket = WebSocketsServer(80);
 
 

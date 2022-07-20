@@ -1,3 +1,7 @@
+/*
+ * Link placa ESP32: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+ */
+
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiAP.h>
