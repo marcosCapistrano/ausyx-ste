@@ -18,7 +18,7 @@ void buzzer_setup() {
 }
 
 void buzzer_loop() {
-  if (temperatura >= tempLimite) {
+  if (temperatura > tempLimite) {
     if (!isAware) {
       int timeNow = millis();
 
