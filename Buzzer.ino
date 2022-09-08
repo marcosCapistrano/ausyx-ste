@@ -12,12 +12,13 @@ int tentativas = 0; // Guarda o numero de tentativas antes de desativar o alarme
 
 void buzzer_setup() {
   pinMode(PIN_BUZZER, OUTPUT);
+  digitalWrite(PIN_BUZZER, HIGH);
 
   lastPlayed = millis();
 }
 
 void buzzer_loop() {
-  if (temperatura >= tempLimite) {
+  if (temperatura > state_manager_get_limit()) {
     if (!isAware) {
       int timeNow = millis();
 
@@ -35,34 +36,34 @@ void buzzer_loop() {
         }
       }
     } else {
-      digitalWrite(PIN_BUZZER, LOW);
+      digitalWrite(PIN_BUZZER, HIGH);
       tentativas = 0;
     }
   } else {
     isAware = false;
     tentativas = 0;
-    digitalWrite(PIN_BUZZER, LOW);
+    digitalWrite(PIN_BUZZER, HIGH);
   }
 }
 
 void buzzer_play_soft() {
-  digitalWrite(PIN_BUZZER, HIGH);
-  delay(250);
   digitalWrite(PIN_BUZZER, LOW);
+  delay(250);
+  digitalWrite(PIN_BUZZER, HIGH);
 
   tentativas++;
   lastPlayed = millis();
 }
 
 void buzzer_play_medium() {
-  digitalWrite(PIN_BUZZER, HIGH);
-  delay(1000);
   digitalWrite(PIN_BUZZER, LOW);
+  delay(1000);
+  digitalWrite(PIN_BUZZER, HIGH);
 
   tentativas++;
   lastPlayed = millis();
 }
 
 void buzzer_play_hard() {
-  digitalWrite(PIN_BUZZER, HIGH);
+  digitalWrite(PIN_BUZZER, LOW);
 }

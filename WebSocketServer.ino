@@ -1,9 +1,8 @@
-const char *ssid = "AusyxSTE_01";
-const char *password = "ausyx_ste";
+const char *ssid = "MTF-01";
+const char *password = "AusyxSolucoes";
 WebSocketsServer webSocket = WebSocketsServer(80);
 
-
-void server_setup() {
+void server_task(void *pvParameters) {
   Serial.println();
   Serial.println("Configurando access point...");
 
@@ -17,10 +16,11 @@ void server_setup() {
 
   webSocket.begin();
   webSocket.onEvent(handle_events);
-}
 
-void server_loop() {
-  webSocket.loop();
+  for(;;) {
+    webSocket.loop();
+    vTaskDelay(100);
+  }
 }
 
 void handle_events(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
@@ -38,8 +38,12 @@ void handle_events(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
     case WStype_TEXT:
       if (length > 0) {
         temperatura = atoi((const char *) payload);
+        if(temperatura < 0) temperatura = 0;
+
+        lastComm = millis() / 1000;
+        hasCommOnce = true;
         
-        Serial.printf("Temperatura setada para: %d\n",temperatura);
+//        Serial.printf("Temperatura setada para: %d\n",temperatura);
 
         // send message to client
         // webSocket.sendTXT(num, "message here");

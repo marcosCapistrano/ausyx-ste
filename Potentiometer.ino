@@ -1,15 +1,24 @@
-#define PIN_POTENTIOMETER 36
+#define PIN_IN1 33
+#define PIN_IN2 34
+
 #define MIN_VALUE 0
-#define MAX_VALUE 99
+#define MAX_VALUE 100
 
-#define SAMPLES 15
+RotaryEncoder *encoder = nullptr;
+int baseLimitValue = 0;
 
-int reading;    //Guarda o valor lido do ADC, antes de se mapear de 0-4095 para MIN_VALUE-MAX_VALUE
-int count = 0; //Guarda quantas vezes o ADC foi lido, após (SAMPLES) vezes o valor é atualizado
-int soma = 0, media = 0;
+IRAM_ATTR void checkPosition()
+{
+  encoder->tick(); // just call tick() to check the state.
+}
 
 void potentiometer_setup(void) {
-//  pinMode(PIN_POTENTIOMETER, INPUT);
+  encoder = new RotaryEncoder(PIN_IN1, PIN_IN2, RotaryEncoder::LatchMode::FOUR3);
+  baseLimitValue = state_manager_get_limit();
+
+  // register interrupt routine
+  attachInterrupt(digitalPinToInterrupt(PIN_IN1), checkPosition, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_IN2), checkPosition, CHANGE);
 }
 
 /*
@@ -17,16 +26,23 @@ void potentiometer_setup(void) {
    mas sim uma variavel count que após esta função rodar SAMPLES vezes, ele atualiza o valor do tempLimite
 */
 void potentiometer_loop(void) {
-  reading = analogRead(PIN_POTENTIOMETER);
-  soma += reading;
+  static int pos = 0;
+  encoder->tick(); // just call tick() to check the state.
 
-  if (count >= SAMPLES) {   
-    media = soma / (SAMPLES + 1);
-    tempLimite = map(media, 0, 4095, MIN_VALUE, MAX_VALUE);
-     
-    count = 0;
-    soma = media;
+  int newPos = encoder->getPosition();
+
+  if (newPos != pos) {
+    int newLimit = baseLimitValue;
+    newLimit += newPos;
+
+    if (newLimit < MIN_VALUE) {
+      newLimit = MIN_VALUE;
+    } else if (newLimit > MAX_VALUE) {
+      newLimit = MAX_VALUE;
+    }
+
+    state_manager_set_limit(newLimit);
+
+    pos = newPos;
   }
-
-  count++;
 }

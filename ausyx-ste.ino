@@ -3,6 +3,9 @@
  */
 
 #include <Arduino.h>
+#include <Preferences.h>
+#include <RotaryEncoder.h>
+
 #include <WiFi.h>
 #include <WiFiAP.h>
 
@@ -13,14 +16,15 @@
 
 bool isAware = false; //Guarda se alguem apertou o botão de silenciar
 int temperatura = 0; // Valor recebido no WebSocketServer, enviado pelo sensor no ESP8266
-int tempLimite = 100; // Valor setado pelo potenciometro
 
 uint32_t lastComm = millis() / 1000;
 bool hasCommOnce = false;
 
 void setup(void) {
   Serial.begin(115200);
-  
+
+  state_manager_setup();
+  potentiometer_setup();
   lcd_setup();
   buzzer_setup();
   mutebutton_setup();
